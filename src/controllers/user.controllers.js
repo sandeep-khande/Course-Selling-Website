@@ -4,6 +4,24 @@ import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+
+const generateAccessAndRefreshTokens = async(userId) =>{
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+
+        return {accessToken, refreshToken}
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    }
+}
+
 const registerUser = asyncHandler( async (req, res) => {
     
     //getting details from frontend
@@ -50,14 +68,26 @@ const registerUser = asyncHandler( async (req, res) => {
 const loginUser = asyncHandler( async(req, res) => {
     const {username, password} = req.body
 
-    const existingUser = await User.findOne({username})
+    const user = await User.findOne({username})
 
-    if(!existingUser || !(await existingUser.isPasswordCorrect(password))){
+    if(!user || !(await user.isPasswordCorrect(password))){
         throw new ApiError("409", "User doesn't exist")
     }
-    return res.status(201).json(
-        new ApiResponse(200, "logged in successfully")
-    );
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
+    // console.log(accessToken, refreshToken);
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: accessToken, refreshToken
+            },
+            "User logged in successfully"
+        )
+    ) 
+
 })
 
 export { registerUser, loginUser }
