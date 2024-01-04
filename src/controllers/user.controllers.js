@@ -47,4 +47,17 @@ const registerUser = asyncHandler( async (req, res) => {
 
 })
 
-export { registerUser }
+const loginUser = asyncHandler( async(req, res) => {
+    const {username, password} = req.body
+
+    const existingUser = await User.findOne({username})
+
+    if(!existingUser || !(await existingUser.isPasswordCorrect(password))){
+        throw new ApiError("409", "User doesn't exist")
+    }
+    return res.status(201).json(
+        new ApiResponse(200, "logged in successfully")
+    );
+})
+
+export { registerUser, loginUser }
