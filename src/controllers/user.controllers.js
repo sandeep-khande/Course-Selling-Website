@@ -18,10 +18,10 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     //Checking if the User already exist
-    const existedUser = User.findOne({username})
+    const existedUser = await User.findOne({username})
 
     if(existedUser){
-        throw ApiError("409", "Username already exists")
+        throw new ApiError("409", "Username already exists")
     }
 
     //Entry in database
@@ -42,7 +42,7 @@ const registerUser = asyncHandler( async (req, res) => {
 
     //Returning response
     return res.status(201).json(
-        new ApiResponse(200, createdUser, "User created successfully")
+        new ApiResponse(200, "User created successfully")
     )
 
 })
