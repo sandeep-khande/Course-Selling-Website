@@ -11,7 +11,9 @@ const generateAccessAndRefreshTokens = async(userId) =>{
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
 
+        //Storing refresh tokens in database
         user.refreshToken = refreshToken
+        //while saving it validates the password again hence false
         await user.save({ validateBeforeSave: false })
 
         return {accessToken, refreshToken}
