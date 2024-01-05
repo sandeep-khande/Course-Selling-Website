@@ -15,7 +15,7 @@ const adminSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        refrehToken: {
+        refreshToken: {
             type: String
         }
     }, 
@@ -40,7 +40,7 @@ adminSchema.methods.isPasswordCorrect = async function (password) {
 
 adminSchema.methods.generateAccessToken = function () {
     // JWT sign takes payload, token secret & expiry
-    Jwt.sign(
+    return Jwt.sign(
         {
             _id: this._id,
             username: this.username
@@ -52,7 +52,7 @@ adminSchema.methods.generateAccessToken = function () {
     )
 }
 adminSchema.methods.generateRefreshToken = function () {
-    Jwt.sign(
+    return Jwt.sign(
         {
             _id: this._id,
             username: this.username

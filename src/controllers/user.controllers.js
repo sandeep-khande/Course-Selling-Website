@@ -28,7 +28,7 @@ const registerUser = asyncHandler( async (req, res) => {
     
     //getting details from frontend
     const { username, password } = req.body
-    console.log("username: ", username);
+    // console.log("username: ", username);
 
     //Validating username
     if (
@@ -91,5 +91,21 @@ const loginUser = asyncHandler( async(req, res) => {
     ) 
 
 })
+
+
+// const allCourses = asyncHandler( async(req, res) => {
+//     const token = req.header;
+//     if(!token){
+//         throw new ApiError(400, "token is required")
+//     }
+
+//     const checkingToken = await User.findOne({token})
+//     if(!checkingToken){
+//         throw new ApiError(400, "Token is incorect")
+//     }
+
+    
+
+// })
 
 export { registerUser, loginUser }
