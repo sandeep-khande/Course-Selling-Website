@@ -2,6 +2,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Admin } from "../models/admin.models.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { Course } from "../models/course.models.js";
+
 
 
 const accessTokenAndRefreshToken = async(userId) => {
@@ -83,4 +86,41 @@ const logInAdmin = asyncHandler( async(req, res) => {
     
 })
 
-export { registerAdmin, logInAdmin }
+const creatingCourse = asyncHandler( async(req, res) => {
+    const { title, description, price } = req.body;
+
+    if (
+        [title, description, price].some((field) => field?.trim() === "")
+    ){
+        throw new ApiError(400, "All fields are required")
+    }
+
+    //Checking for the image
+    const imageLinkLocalPath = req.files?.imageLink[0]?.path;
+
+    if(!imageLinkLocalPath){
+        throw new ApiError(400, "image file is required")
+    }
+
+    //Uploading them to cloudinary
+    const imageLink = await uploadOnCloudinary(imageLinkLocalPath)
+
+    if(!imageLink){
+        throw new ApiError(400, "Image file is required")
+    }
+
+    const course = await Course.create({
+        title,
+        description,
+        price,
+        imageLink: imageLink.url
+    })
+
+    res.status(200).json(
+        new ApiResponse(200, course._id, "course created successfully")
+    )
+
+
+})
+
+export { registerAdmin, logInAdmin, creatingCourse }
