@@ -3,11 +3,24 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Admin } from "../models/admin.models.js"
 
+
+const accessTokenAndRefreshToken = async(userId) => {
+    const admin = await Admin.findById(userId);
+    const accessToken = admin.generateAccessToken()
+    const refreshToken = admin.generateRefreshToken()
+
+    admin.refreshToken = refreshToken
+
+    await admin.save({ validateBeforeSave: false })
+
+    return { accessToken, refreshToken}
+}
+
 const registerAdmin = asyncHandler( async(req, res) => {
 
     //getting details from frontend
     const { username, password } = req.body;
-    console.log("username", username);
+    // console.log("username", username);
 
     //checking if the field is empty
     if (
@@ -45,4 +58,29 @@ const registerAdmin = asyncHandler( async(req, res) => {
     )
 })
 
-export { registerAdmin }
+const logInAdmin = asyncHandler( async(req, res) => {
+    const { username, password } = req.body;
+    
+    const existingAdmin = await Admin.findOne({username})
+
+    if(!existingAdmin || !(await existingAdmin.isPasswordCorrect(password))){
+        throw new ApiError(409, "Admin doesn't exist")
+    }
+
+    const {accessToken, refreshToken} = await accessTokenAndRefreshToken(existingAdmin._id)
+    console.log(accessToken, refreshToken);
+
+    res.status(201).json(
+        new ApiResponse
+        (
+            200,
+            {
+                existingAdmin: accessToken, refreshToken
+            },
+            "Admin logged in successfully"
+        )
+    )
+    
+})
+
+export { registerAdmin, logInAdmin }

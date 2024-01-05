@@ -73,7 +73,7 @@ const loginUser = asyncHandler( async(req, res) => {
     const user = await User.findOne({username})
 
     if(!user || !(await user.isPasswordCorrect(password))){
-        throw new ApiError("409", "User doesn't exist")
+        throw new ApiError(409, "User doesn't exist")
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
