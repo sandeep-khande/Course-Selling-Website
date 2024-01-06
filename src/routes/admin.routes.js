@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { registerAdmin, logInAdmin, creatingCourse, viewingCourses } from "../controllers/admin.controllers.js"
 import {upload} from "../middlewares/multer.middleware.js"
+import { verifyJwt } from "../middlewares/adminAuth.middleware.js";
 
 
 const adminRouter = Router()
@@ -11,6 +12,7 @@ adminRouter.route("/signin").post(logInAdmin)
 
 adminRouter.route("/courses").post
 (
+    verifyJwt,
     upload.fields([
         {
             name: "imageLink",
@@ -20,6 +22,6 @@ adminRouter.route("/courses").post
     creatingCourse
 )
 
-adminRouter.route("/courses").get(viewingCourses)
+adminRouter.route("/courses").get(verifyJwt, viewingCourses)
 
 export default adminRouter

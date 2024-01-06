@@ -80,14 +80,14 @@ const logInAdmin = asyncHandler( async(req, res) => {
 
     res
     .status(201)
-    .cookies("accessToken", accessToken, options)
-    .cookies("refreshTokens", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshTokens", refreshToken, options)
     .json(
         new ApiResponse
         (
             200,
             {
-                existingAdmin: accessToken, refreshToken
+                accessToken, refreshToken
             },
             "Admin logged in successfully"
         )
@@ -133,7 +133,11 @@ const creatingCourse = asyncHandler( async(req, res) => {
 })
 
 const viewingCourses = asyncHandler( async(req, res) => {
-    
+    const allCourses = await Course.find({})
+
+    res.status(200).json(
+        new ApiResponse(200, allCourses)
+    )
 })
 
 export { registerAdmin, logInAdmin, creatingCourse, viewingCourses }
