@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Course } from "../models/course.models.js";
+import mongoose from "mongoose";
 
 
 const generateAccessAndRefreshTokens = async(userId) =>{
@@ -110,4 +111,30 @@ const allCourses = asyncHandler( async(req, res) => {
     )
 })
 
-export { registerUser, loginUser, allCourses }
+const purchasingCourse = asyncHandler( async(req, res) => {
+    try {
+        const course = await Course.findOne({_id: req.params.courseId});
+        console.log(req.params.courseId);
+        const UpdatedUser = await User.findOneAndUpdate({
+            username: req.user,
+        },{
+            $push: {purchasedCourses: course}
+        });
+
+        res.json({message: 'Course Purchased Succesfully'});
+    } catch (error) {
+        res.json({"error": error.message});
+    }
+})
+
+const myCourses = asyncHandler( async(req, res) => {
+    try {
+        const user = await User.findOne({username: req.user});
+        await user.populate('purchasedCourses');
+        res.json({purchasedCourses: user.purchasedCourses});
+    } catch (error) {
+        res.json({"error": error.message});
+    }
+})
+
+export { registerUser, loginUser, allCourses, purchasingCourse, myCourses }

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { registerUser, loginUser, allCourses } from "../controllers/user.controllers.js";
 import { verifyUserJwt } from "../middlewares/userAuth.middleware.js";
+import { registerUser, loginUser, allCourses, purchasingCourse, myCourses } from "../controllers/user.controllers.js";
 
 
 const router = Router()
@@ -11,8 +11,8 @@ router.route("/signin").post(loginUser)
 
 router.route("/courses").get(verifyUserJwt, allCourses)
 
-// router.route("/course/:courseId").post(purchasingCourse)
+router.route("/courses/:courseId").post(verifyUserJwt, purchasingCourse)
 
-// router.route("purchasedCourses").get(myCourses)
+router.route("purchasedCourses").get(myCourses)
 
 export default router

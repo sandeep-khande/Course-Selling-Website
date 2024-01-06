@@ -2,6 +2,10 @@ import mongoose, {Schema} from "mongoose";
 
 const courseSchema = new mongoose.Schema(
     {
+        _id: {
+            type: String,
+            required: true
+        },
         title: {
             type: String,
             required: true,

@@ -17,7 +17,13 @@ const userSchema = new mongoose.Schema(
         },
         refreshToken: {
             type: String
-        }
+        },
+        purchasedCourse: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Course"
+            }
+        ]
     },
     {
         timestamps: true
