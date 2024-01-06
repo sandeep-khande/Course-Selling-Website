@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Course } from "../models/course.models.js";
 
 
 const generateAccessAndRefreshTokens = async(userId) =>{
@@ -79,12 +80,20 @@ const loginUser = asyncHandler( async(req, res) => {
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
     // console.log(accessToken, refreshToken);
 
-    return res.status(200)
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
     .json(
         new ApiResponse(
             200,
             {
-                user: accessToken, refreshToken
+                accessToken, refreshToken
             },
             "User logged in successfully"
         )
@@ -93,19 +102,12 @@ const loginUser = asyncHandler( async(req, res) => {
 })
 
 
-// const allCourses = asyncHandler( async(req, res) => {
-//     const token = req.header;
-//     if(!token){
-//         throw new ApiError(400, "token is required")
-//     }
+const allCourses = asyncHandler( async(req, res) => {
+    const courses = await Course.find({})
 
-//     const checkingToken = await User.findOne({token})
-//     if(!checkingToken){
-//         throw new ApiError(400, "Token is incorect")
-//     }
+    res.status(200).json(
+        new ApiResponse(200, courses)
+    )
+})
 
-    
-
-// })
-
-export { registerUser, loginUser }
+export { registerUser, loginUser, allCourses }
