@@ -73,7 +73,16 @@ const logInAdmin = asyncHandler( async(req, res) => {
     const {accessToken, refreshToken} = await accessTokenAndRefreshToken(existingAdmin._id)
     console.log(accessToken, refreshToken);
 
-    res.status(201).json(
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    res
+    .status(201)
+    .cookies("accessToken", accessToken, options)
+    .cookies("refreshTokens", refreshToken, options)
+    .json(
         new ApiResponse
         (
             200,
@@ -123,4 +132,8 @@ const creatingCourse = asyncHandler( async(req, res) => {
 
 })
 
-export { registerAdmin, logInAdmin, creatingCourse }
+const viewingCourses = asyncHandler( async(req, res) => {
+    
+})
+
+export { registerAdmin, logInAdmin, creatingCourse, viewingCourses }

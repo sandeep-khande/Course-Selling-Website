@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerAdmin, logInAdmin, creatingCourse } from "../controllers/admin.controllers.js"
+import { registerAdmin, logInAdmin, creatingCourse, viewingCourses } from "../controllers/admin.controllers.js"
 import {upload} from "../middlewares/multer.middleware.js"
 
 
@@ -9,7 +9,8 @@ adminRouter.route("/signup").post(registerAdmin)
 
 adminRouter.route("/signin").post(logInAdmin)
 
-adminRouter.route("/courses").post(
+adminRouter.route("/courses").post
+(
     upload.fields([
         {
             name: "imageLink",
@@ -17,6 +18,8 @@ adminRouter.route("/courses").post(
         }
     ]),
     creatingCourse
-    )
+)
+
+adminRouter.route("/courses").get(viewingCourses)
 
 export default adminRouter
