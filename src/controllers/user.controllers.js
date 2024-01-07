@@ -112,19 +112,38 @@ const allCourses = asyncHandler( async(req, res) => {
 })
 
 const purchasingCourse = asyncHandler( async(req, res) => {
-    try {
-        const course = await Course.findOne({_id: req.params.courseId});
-        console.log(req.params.courseId);
-        const UpdatedUser = await User.findOneAndUpdate({
-            username: req.user,
-        },{
-            $push: {purchasedCourses: course}
-        });
+    const courseId = req.query.courseId
+    console.log(courseId);
 
-        res.json({message: 'Course Purchased Succesfully'});
-    } catch (error) {
-        res.json({"error": error.message});
+    const requiredCourse = await Course.findOne({ _id: courseId })
+    console.log(requiredCourse);
+
+    if(!requiredCourse){
+        throw new ApiError(404, "course not found")
     }
+
+    console.log(req.user.username);
+    const purchasedCourse = await User.findOneAndUpdate(
+        {
+            username: req.user.username
+        },
+        {
+            $push: {"purchasedCourse": [requiredCourse]}
+        },
+        {
+            returnNewDocument: true
+        }
+    )
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                purchasedCourse
+            },
+            "course purchased successfully"
+        )
+    )
 })
 
 const myCourses = asyncHandler( async(req, res) => {
