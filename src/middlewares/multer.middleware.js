@@ -1,3 +1,5 @@
+//Here we will use multer to store the images temporarily on our server.
+
 import multer from "multer";
 
 const storage = multer.diskStorage({
