@@ -13,6 +13,6 @@ router.route("/courses").get(verifyUserJwt, allCourses)
 
 router.route("/courses/:courseId").post(verifyUserJwt, purchasingCourse)
 
-router.route("/purchasedCourses").get(myCourses)
+router.route("/purchasedCourses").get(verifyUserJwt ,myCourses)
 
 export default router

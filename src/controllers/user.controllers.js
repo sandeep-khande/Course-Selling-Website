@@ -113,16 +113,16 @@ const allCourses = asyncHandler( async(req, res) => {
 
 const purchasingCourse = asyncHandler( async(req, res) => {
     const courseId = req.query.courseId
-    console.log(courseId);
+    // console.log(courseId);
 
-    const requiredCourse = await Course.findOne({ _id: courseId })
-    console.log(requiredCourse);
+    const requiredCourse = await Course.findOne({ _id: courseId }).select(" -password -refreshToken ")
+    // console.log(requiredCourse);
 
     if(!requiredCourse){
         throw new ApiError(404, "course not found")
     }
 
-    console.log(req.user.username);
+    // console.log(req.user.username);
     const purchasedCourse = await User.findOneAndUpdate(
         {
             username: req.user.username
@@ -147,13 +147,25 @@ const purchasingCourse = asyncHandler( async(req, res) => {
 })
 
 const myCourses = asyncHandler( async(req, res) => {
-    try {
-        const user = await User.findOne({username: req.user});
-        await user.populate('purchasedCourses');
-        res.json({purchasedCourses: user.purchasedCourses});
-    } catch (error) {
-        res.json({"error": error.message});
+    const username = req.user.username
+    const user = await User.findOne({ username })
+    // console.log(user);
+
+    if(!user){
+        throw new ApiError(404, "User not found")
     }
+
+    const purchasedCourse = await user.populate("purchasedCourse") 
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user: purchasedCourse
+            }
+            )
+    )
+
 })
 
 export { registerUser, loginUser, allCourses, purchasingCourse, myCourses }
